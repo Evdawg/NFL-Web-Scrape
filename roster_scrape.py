@@ -43,7 +43,7 @@ team_list = ['arizona-cardinals',
 ### Send any Errors for specific team choice to a list:
 exceptions = []
 
-roster_df = pd.DataFrame(columns=['Player', 'No', 'Pos', 'Status', 'Height', 'Weight', 'Experience', 'College', 'Player link', 'Team', 'Year'])
+roster_df = pd.DataFrame()
 
 ### TODO: Levi recommends to write a function that has the dataframe as a parameter. Select statements if cannot concat straight up.
 #       define a function that performs the concatenation instead of calling the method repeatedly within a loop:
@@ -65,36 +65,55 @@ for i in range(0, 2):  # len(team_list)):
         url = root + team_choice + url_end_piece
         print('Scraping roster table for ' + url)
 
-        ### create the soup object here
-        ### this is where you input the url and output the soup object that parses the webpage
-        result = requests.get(url)
-        webpage = result.content
-        soup = BeautifulSoup(webpage, "html.parser")
+        ### Need to create a beautifulsoup object to parse the whole page:
+        res = requests.get(url)
+        webpage = res.content
+        soup = BeautifulSoup(webpage, 'html.parser')
 
-        ### find the html table mark up and then find all row tag objects inside that table object
-        ### nfl.com stats pages only contain one table, so don't need to worry about processing multiple tables in this web scrape
-        table = soup.find('table', {'summary': 'Roster'})
+        ### pd.read_html() parses for tables and returns a list of dataframes.
+        dfs = pd.read_html(url)   #main-content > section:nth-child(5) > div > div:nth-child(2) > div > div.d3-o-table--horizontal-scroll > table
+        df = dfs[0]
 
-        headers = []
-        for i in table.find_all('th'):
-            title = i.text.strip()
-            headers.append(title)
-
-        ### Send full table and all rows to a DataFrame object for the team_choice roster:
-        df = pd.DataFrame(columns=headers)
-        for row in table.findAll('tr')[1:]:
-            data = row.findAll('td')
-            row_data = [td.text.strip() for td in data]
-            print(row_data)
-            length = len(df)
-            df.loc[length] = row_data
+        #         df['Team Name'] = str(soup.find('a', {'nfl-o-cta--link'}).text.strip())
+        df['Team'] = str(soup.find('div', {'class': 'nfl-c-team-header__title'}).text.strip())
+        df['Year'] = 2022
+        #df['Player link'] = 'test'
+        print(df)
 
         roster_df = pd.concat([roster_df, df], ignore_index=True, axis=0)
+
+# -----------------------------------------------------------------------------------------------------------------
+        # ### create the soup object here
+        # ### this is where you input the url and output the soup object that parses the webpage
+        # result = requests.get(url)
+        # webpage = result.content
+        # soup = BeautifulSoup(webpage, "html.parser")
+        #
+        # ### find the html table mark up and then find all row tag objects inside that table object
+        # ### nfl.com stats pages only contain one table, so don't need to worry about processing multiple tables in this web scrape
+        # table = soup.find('table', {'summary': 'Roster'})
+        #
+        # headers = []
+        # for i in table.find_all('th'):
+        #     title = i.text.strip()
+        #     headers.append(title)
+        #
+        # ### Send full table and all rows to a DataFrame object for the team_choice roster:
+        # df = pd.DataFrame(columns=headers)
+        # for row in table.findAll('tr')[1:]:
+        #     data = row.findAll('td')
+        #     row_data = [td.text.strip() for td in data]
+        #     print(row_data)
+        #     length = len(df)
+        #     df.loc[length] = row_data
+        #
+        # roster_df = pd.concat([roster_df, df], ignore_index=True, axis=0)
 
     ### TODO: Add three columns not included in the NFL.com table and populate within the loop:
             ### Attempt to concat the individual team roster table to a global DataFrame to save each df
             ### that is otherwise overwritten in each loop
 
+# -----------------------------------------------------------------------------------------------------------------
 
     except AttributeError:  # the except statement sends Attribute errors to a list that is exported after the loop is finished
         exceptions.append(team_choice)
@@ -108,4 +127,4 @@ print(roster_df)
 
 roster_df.to_csv(r'C:\Users\EvanS\Programming\PyCharm\Projects\NFL-Web-Scrape-V2\Scrap files\test.csv')
 
-### The dataframe is being overwritten with each loop pass. Need to fix it so all pages scraped go to the same dataframe.
+
