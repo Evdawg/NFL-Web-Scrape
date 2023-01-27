@@ -45,11 +45,10 @@ exceptions = []
 
 roster_df = pd.DataFrame()
 
-### TODO: Levi recommends to write a function that has the dataframe as a parameter. Select statements if cannot concat straight up.
+### TODO: Levi recommends to write a function that has the dataframe as a parameter. May need to use Select statments.
 #       define a function that performs the concatenation instead of calling the method repeatedly within a loop:
 #       def data_concat():
-#           print('concatenating global roster_df with the ' + team_choice + ' DataFrame.')
-#           pd.concat([roster_df, df], ignore_index=True)
+#               .........
 
 
 ### Loop through NFL.com team rosters webpage schema:
@@ -90,48 +89,13 @@ for i in range(0, 1):  # len(team_list)):
                 if link == None:
                     Player_links.append(str('N/A'))
         df['Player link'] = Player_links
-
         # links_df = pd.DataFrame(Player_links, columns= ['Player link'])
         # print(links_df)
         # links_df.to_csv(r'C:\Users\EvanS\Programming\PyCharm\Projects\NFL-Web-Scrape-V2\Scrap files\test_links.csv')
 
-
-
         print(team_choice + ' DataFrame concatenated with roster_df.')
         roster_df = pd.concat([roster_df, df], ignore_index=True, axis=0)
 
-# -----------------------------------------------------------------------------------------------------------------
-        # ### create the soup object here
-        # ### this is where you input the url and output the soup object that parses the webpage
-        # result = requests.get(url)
-        # webpage = result.content
-        # soup = BeautifulSoup(webpage, "html.parser")
-        #
-        # ### find the html table mark up and then find all row tag objects inside that table object
-        # ### nfl.com stats pages only contain one table, so don't need to worry about processing multiple tables in this web scrape
-        # table = soup.find('table', {'summary': 'Roster'})
-        #
-        # headers = []
-        # for i in table.find_all('th'):
-        #     title = i.text.strip()
-        #     headers.append(title)
-        #
-        # ### Send full table and all rows to a DataFrame object for the team_choice roster:
-        # df = pd.DataFrame(columns=headers)
-        # for row in table.findAll('tr')[1:]:
-        #     data = row.findAll('td')
-        #     row_data = [td.text.strip() for td in data]
-        #     print(row_data)
-        #     length = len(df)
-        #     df.loc[length] = row_data
-        #
-        # roster_df = pd.concat([roster_df, df], ignore_index=True, axis=0)
-
-    ### TODO: Add three columns not included in the NFL.com table and populate within the loop:
-            ### Attempt to concat the individual team roster table to a global DataFrame to save each df
-            ### that is otherwise overwritten in each loop
-
-# -----------------------------------------------------------------------------------------------------------------
 
     except AttributeError:  # the except statement sends Attribute errors to a list that is exported after the loop is finished
         exceptions.append(team_choice)
@@ -140,9 +104,5 @@ for i in range(0, 1):  # len(team_list)):
             r'C:\Users\EvanS\Programming\PyCharm\Projects\NFL-Web-Scrape-V2\Scrap files\review_roster_scrape_output.csv', 'w') as fp:
         fp.write('\n'.join(exceptions))
 
-
 print(roster_df)
-
 roster_df.to_csv(r'C:\Users\EvanS\Programming\PyCharm\Projects\NFL-Web-Scrape-V2\Scrap files\test.csv')
-
-
