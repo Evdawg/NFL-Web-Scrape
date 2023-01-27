@@ -71,34 +71,33 @@ for i in range(0, 1):  # len(team_list)):
         soup = BeautifulSoup(webpage, 'html.parser')
 
         ### pd.read_html() parses for tables and returns a list of dataframes.
-        dfs = pd.read_html(url)   #main-content > section:nth-child(5) > div > div:nth-child(2) > div > div.d3-o-table--horizontal-scroll > table
+        dfs = pd.read_html(url)
         df = dfs[0]
 
         df['Team'] = str(soup.find('div', {'class': 'nfl-c-team-header__title'}).text.strip())
         df['Year'] = 2022
 
-        ### TODO: figure out how to add column of just the href player name for player stats web scrape:
+        ### Create list of hyperlinks to player page, concat as a df to the roster_df:
         table = soup.find('table', {'summary': 'Roster'})
         Player_links = []
 
-        ### TODO: some players do not have hyperlink to their own page. Want to populate that list item with 'N/A' rather than that row being skipped. How to do???
-        for link in soup.findAll('a', {'class': 'nfl-o-roster__player-name nfl-o-cta--link'}):  #<a class="nfl-o-roster__player-name nfl-o-cta--link" href="/players/will-hernandez/" aria-label="Go to Will Hernandez's profile page">Will Hernandez</a>
+        ### Some players do not have hyperlink to their own page. Populates Player_links list with 'N/A' rather than that row being skipped.
+        for row in table.findAll('tr')[1:]:
+            link = row.find('a', {'class': 'nfl-o-roster__player-name nfl-o-cta--link'})
             if link != None:
-                Player_links.append(link.get('href'))
+                Player_links.append('https://www.nfl.com' + link.get('href'))
             else:
                 if link == None:
                     Player_links.append(str('N/A'))
+        df['Player link'] = Player_links
 
-        links_df = pd.DataFrame(Player_links, columns= ['Player link'])
-        print(links_df)
-        links_df.to_csv(r'C:\Users\EvanS\Programming\PyCharm\Projects\NFL-Web-Scrape-V2\Scrap files\test_links.csv')
-
-        #df['Player link'] = str(soup.findAll('a', {'class': 'nfl-o-roster__player-name nfl-o-cta--link'})) # this only pulls the first element from the table and applies to all rows. Need each different element per row.
-
+        # links_df = pd.DataFrame(Player_links, columns= ['Player link'])
+        # print(links_df)
+        # links_df.to_csv(r'C:\Users\EvanS\Programming\PyCharm\Projects\NFL-Web-Scrape-V2\Scrap files\test_links.csv')
 
 
-        print(df)
 
+        print(team_choice + ' DataFrame concatenated with roster_df.')
         roster_df = pd.concat([roster_df, df], ignore_index=True, axis=0)
 
 # -----------------------------------------------------------------------------------------------------------------
