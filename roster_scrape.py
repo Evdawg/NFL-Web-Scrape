@@ -6,6 +6,9 @@ import os
 from datetime import date
 import numpy as np
 import csv
+import psycopg2
+import sqlalchemy
+
 
 team_list = ['arizona-cardinals',
 'baltimore-ravens',
@@ -52,7 +55,7 @@ roster_df = pd.DataFrame()
 
 
 ### Loop through NFL.com team rosters webpage schema:
-for i in range(0, 1):  # len(team_list)):
+for i in range(0, 3):  # len(team_list)):
     try:
         team_choice = team_list[i]
         print(team_choice)
@@ -106,3 +109,5 @@ for i in range(0, 1):  # len(team_list)):
 
 print(roster_df)
 roster_df.to_csv(r'C:\Users\EvanS\Programming\PyCharm\Projects\NFL-Web-Scrape-V2\Scrap files\test.csv')
+
+### TODO: Send the completed roster_df to a SQL database using psycopg2 and SQLalchemy libraries.
