@@ -100,7 +100,7 @@ for i in range(0, 3):  # len(team_list)):
         roster_df = pd.concat([roster_df, df], ignore_index=True, axis=0)
 
 
-    except AttributeError:  # the except statement sends Attribute errors to a list that is exported after the loop is finished
+    except AttributeError:  # the except statement sends Attribute errors to a list that can be exported after the loop is finished.
         exceptions.append(team_choice)
 
     with open(
@@ -111,3 +111,4 @@ print(roster_df)
 roster_df.to_csv(r'C:\Users\EvanS\Programming\PyCharm\Projects\NFL-Web-Scrape-V2\Scrap files\test.csv')
 
 ### TODO: Send the completed roster_df to a SQL database using psycopg2 and SQLalchemy libraries.
+
