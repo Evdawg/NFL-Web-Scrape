@@ -8,6 +8,7 @@ import numpy as np
 import csv
 import psycopg2
 import sqlalchemy
+from config_file import *
 
 
 team_list = ['arizona-cardinals',
@@ -111,4 +112,3 @@ print(roster_df)
 roster_df.to_csv(r'C:\Users\EvanS\Programming\PyCharm\Projects\NFL-Web-Scrape-V2\Scrap files\test.csv')
 
 ### TODO: Send the completed roster_df to a SQL database using psycopg2 and SQLalchemy libraries.
-
