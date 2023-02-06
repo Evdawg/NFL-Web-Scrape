@@ -6,23 +6,15 @@ import config_file
 
 ### TODO: Import SQLAlchemy to allow functionality for sending DataFrame object to SQL table.
 
-# replace global variables with reference to config.ini references here:
+
+### Set the SQL references to the config file settings:
 #-----------------------------------------------------------------------------------------------------------------------
 
-
-# database = 'NFLdb'
-# hostname = 'localhost'
-# username = 'postgres'
-# pwd = 'Pizza5000'
-# port_id = 5432
-
-
-### Set the SQL references to the config file settings below:
-#-----------------------------------------------------------------------------------------------------------------------
-
-### Reads the config file for reference to user SQLdb
+# Reads the config file for reference to user SQLdb
 config = config_file.read_config()
 
+conn = None
+cur = None
 
 try:
 # Create the connection.
@@ -60,8 +52,8 @@ except Exception as error:
     print(error)
 
 ### Close the connection even if error is present.
-# finally:
-#     if cur is not None:
-#         cur.close()
-#     if conn is not None:
-#         conn.close()
+finally:
+    if cur is not None:
+        cur.close()
+    if conn is not None:
+        conn.close()
