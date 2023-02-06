@@ -1,8 +1,11 @@
 import configparser
-from configparser   import ConfigParser
+from configparser import ConfigParser
 import pathlib
 
-### Here are a couple of examples for how to parse a config file. This does not include writing new config files, only reading existing.
+### This is the helper file for referencing config file settings within your project. Example 2 is the preferred method.
+# This does not include writing new config files, only reading existing.
+# Don't forget to import config_file in python code.
+
 
 #-----------------------------------------------------------------------------------------------------------------------
 ### example 1:
@@ -36,5 +39,4 @@ def read_config():
     print('Parsing: ' + str(conf_file_path))
     config.read(conf_file_path)
     return config
-
-read_config()
+# read_config()
