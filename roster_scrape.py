@@ -120,7 +120,7 @@ try:
             fp.write('\n'.join(exceptions))
 
     print(roster_df)
-    roster_df.to_csv(r'C:\Users\EvanS\Programming\PyCharm\Projects\NFL-Web-Scrape-V2\Scrap files\test.csv')
+    #roster_df.to_csv(r'C:\Users\EvanS\Programming\PyCharm\Projects\NFL-Web-Scrape-V2\Scrap files\test.csv')
 
 ### End code block here.
 #-----------------------------------------------------------------------------------------------------------------------
@@ -137,3 +137,4 @@ try:
 # Close the connection if no error in try-except block:
 except Exception as error:
     print(error)
+    engine.dispose()

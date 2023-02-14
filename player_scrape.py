@@ -30,6 +30,7 @@ url_object = URL.create(
 # Create the engine and session:
 engine = create_engine(url_object, echo= False)
 
+#-----------------------------------------------------------------------------------------------------------------------
 with engine.begin() as connection:
     links_df = pd.read_sql(
         sql=text(fr'SELECT "Pos", "Player link" FROM public."Rosters_2022"'),
@@ -37,48 +38,29 @@ with engine.begin() as connection:
 #print(links_df)
 
 # Send any loop iterations with error to an exceptions list:
-# TODO: add code to append to this exceptions list if error during run
 exceptions = []
 
 ### TODO: Figure out a better way to make these global DataFrames for each Position name. All player positions will have their own table due to shared headers.
 ### See https://stackoverflow.com/questions/68607106/creating-multiple-dataframes-using-for-loop-with-pandas for example of storing the dataframes in a dictionary.
 # Need to be able to concat scraped table data to the correct DataFrame within the webpage loop.
-# dynamic variables is bad practice, so just type out each dataframe variable for each position:
+# dynamic variables is bad practice, so for now just type out each dataframe variable for each position:
 # Need to split out DataFrames by player position: C, CB, DB, DE, DL, DT, FB, FS, G, ILB, K, LB, LS, MLB, NT, OLB, OT, P, QB, RB, S, SAF, TE, WR:
-pos_df_C = pd.DataFrame()
-pos_df_CB = pd.DataFrame()
-pos_df_DB = pd.DataFrame()
-pos_df_DE = pd.DataFrame()
-pos_df_DL = pd.DataFrame()
-pos_df_DT = pd.DataFrame()
-pos_df_FB = pd.DataFrame()
-pos_df_FS = pd.DataFrame()
-pos_df_G = pd.DataFrame()
-pos_df_ILB = pd.DataFrame()
-pos_df_K = pd.DataFrame()
-pos_df_LB = pd.DataFrame()
-pos_df_LS = pd.DataFrame()
-pos_df_MLB = pd.DataFrame()
-pos_df_NT = pd.DataFrame()
-pos_df_OLB = pd.DataFrame()
-pos_df_OT = pd.DataFrame()
-pos_df_P = pd.DataFrame()
-pos_df_QB = pd.DataFrame()
-pos_df_RB = pd.DataFrame()
-pos_df_S = pd.DataFrame()
-pos_df_SAF = pd.DataFrame()
-pos_df_TE = pd.DataFrame()
-pos_df_WR = pd.DataFrame()
 
+pos_list = ['C', 'CB', 'DB', 'DE', 'DL', 'DT', 'FB', 'FS', 'G', 'ILB', 'K', 'LB', 'LS', 'MLB', 'NT', 'OLB', 'OT', 'P', 'QB', 'RB', 'S', 'SAF', 'TE', 'WR']
+
+pos_df = {}
+for pos in pos_list:
+    pos_df[pos] = pd.DataFrame()
+#print(pos_df)
 
 # Loop through links_df to scrape all players data:
-for i in range(0, 3): #len(links_df)):
+for i in range(0, len(links_df)):
     try:
         webpage = links_df['Player link'][i] + 'stats/'
         print(webpage)
 
         player_pos = links_df['Pos'][i]
-        print(player_pos)
+        #print(player_pos)
 
 
 ### Continue here with the webpage parsing code. See roster_scrape.py for reference:
@@ -91,83 +73,41 @@ for i in range(0, 3): #len(links_df)):
         dfs = pd.read_html(webpage)
         df = dfs[0]
 
+        ### Add columns for player name, team name and year:
+        df['Player'] = str(soup.find('h1', {'class': 'nfl-c-player-header__title'}).text.strip())
+
         try:
             df['Team'] = str(soup.find('a', {'class': 'nfl-o-cta--link'}).text.strip())
         except:
             df['Team'] = 'N/A'
 
         df['Year'] = 2022
-        print(dfs[0])
 
-        ### TODO: Now concatenate the player's dfs[0] with the global df that matches their position title:
-        #print('Player DataFrame concatenated with global positional DataFrame: ' + 'pos_df_' + player_pos)
-        #pos_df_ = pd.concat([roster_df, df], ignore_index=True, axis=0)
+        ### Now concatenate the player's dfs[0] with the global df that matches their position title:
+        print('Player DataFrame concatenated with ' + str(player_pos) + ' DataFrame.')
+        pos_df[player_pos] = pd.concat([pos_df[player_pos], df], ignore_index=True, axis=0)
+        print(pos_df[player_pos])
 
+    except AttributeError:  # the except statement sends Attribute errors to a list that can be exported after the loop is finished.
+        exceptions.append(webpage)
+        print('There was at least one error during web scrape loop')
 
+    with open(
+            r'C:\Users\EvanS\Programming\PyCharm\Projects\NFL-Web-Scrape-V2\Scrap files\review_roster_scrape_output.csv', 'w') as fp:
+        fp.write('\n'.join(exceptions))
 
-    except:
-        print('error during web scrape loop')
-
-
-
+### End code block here.
 #-----------------------------------------------------------------------------------------------------------------------
-# for i in range(0, len(player_list)):
-#     try:
-#         player_choice = player_list[i]
-#         i += 1
-#         print(player_choice)
-#         print(str(i) + '/' + str(len(player_list)))
-#
-#         root = 'https://www.nfl.com/players/'
-#         url_end_piece = '/stats/'
-#
-#         url = root + player_choice + url_end_piece
-#
-#
-#         # create the soup object here
-#         # this is where I input the url and output the soup object that parses the webpage
-#         result = requests.get(url)
-#         webpage = result.content
-#         soup = BeautifulSoup(webpage, "html.parser")
-#
-#         # find the html table mark up and then find all row tag objects inside that table object
-#         # nfl.com stats pages only contain one table, so don't need to worry about multiple tables in this web scrape
-#         table = soup.find('table', {'summary': 'Recent Games'})
-#
-#         headers = []
-#         for i in table.find_all('th'):
-#             title = i.text.strip()
-#             headers.append(title)
-#
-#         df = pd.DataFrame(columns = headers)
-#         for row in table.findAll('tr')[1:]:
-#             data = row.findAll('td')
-#             row_data = [td.text.strip() for td in data]
-#             length = len(df)
-#             df.loc[length] = row_data
-#
-#
-#
-#         #add columns to append player name, position, and team name:
-#         df['Player'] = str(soup.find('h1', {'class': 'nfl-c-player-header__title'}).text.strip())
-#
-#         df['Position'] = str(soup.find('span', {'nfl-c-player-header__position'}).text.strip())
-#
-#         df['Team Name'] = str(soup.find('a', {'nfl-o-cta--link'}).text.strip())
-#
-#
-#         filepath= r'C:\Users\EvanS\Programming\PyCharm\Projects\Web Scrape NFL\2022 weekly data by player'
-#         outname = str(soup.find('span', {'nfl-c-player-header__position'}).text.strip()) + '_' + str(player_choice) + '_2022_addteam.csv'
-#         #print(outname)
-#         #print(filepath)
-#         fullname = os.path.join(filepath, outname)
-#         df.to_csv(fullname)
-#
-#
-#     except AttributeError:    # the except statement sends Attribute errors to a list that is exported after the loop is finished
-#         exceptions.append(player_choice)
-#
-#     with open(r'C:\Users\EvanS\Programming\PyCharm\Projects\Web Scrape NFL\review_list_4.csv', 'w') as fp:
-#         fp.write('\n'.join(exceptions))
 
-#-----------------------------------------------------------------------------------------------------------------------
+### Send the completed positional DataFrames to SQL database using psycopg2 and SQLalchemy libraries:
+
+for key in pos_df:
+    df.to_sql(
+        name= key + ' Data 2022',
+        con= engine,
+        if_exists= 'replace',
+        index= False)
+
+# Close the connection if no error in try-except block:
+engine.dispose()
+print('SQLAlchemy engine disposed. Program is done running.')
