@@ -34,44 +34,45 @@ with engine.begin() as connection:
     links_df = pd.read_sql(
         sql=text(fr'SELECT "Pos", "Player link" FROM public."Rosters_2022"'),
         con=connection,)
-print(links_df)
+#print(links_df)
 
 # Send any loop iterations with error to an exceptions list:
 # TODO: add code to append to this exceptions list if error during run
 exceptions = []
 
 ### TODO: Figure out a better way to make these global DataFrames for each Position name. All player positions will have their own table due to shared headers.
+### See https://stackoverflow.com/questions/68607106/creating-multiple-dataframes-using-for-loop-with-pandas for example of storing the dataframes in a dictionary.
 # Need to be able to concat scraped table data to the correct DataFrame within the webpage loop.
 # dynamic variables is bad practice, so just type out each dataframe variable for each position:
 # Need to split out DataFrames by player position: C, CB, DB, DE, DL, DT, FB, FS, G, ILB, K, LB, LS, MLB, NT, OLB, OT, P, QB, RB, S, SAF, TE, WR:
-    pos_df_C = pd.DataFrame()
-    pos_df_CB = pd.DataFrame()
-    pos_df_DB = pd.DataFrame()
-    pos_df_DE = pd.DataFrame()
-    pos_df_DL = pd.DataFrame()
-    pos_df_DT = pd.DataFrame()
-    pos_df_FB = pd.DataFrame()
-    pos_df_FS = pd.DataFrame()
-    pos_df_G = pd.DataFrame()
-    pos_df_ILB = pd.DataFrame()
-    pos_df_K = pd.DataFrame()
-    pos_df_LB = pd.DataFrame()
-    pos_df_LS = pd.DataFrame()
-    pos_df_MLB = pd.DataFrame()
-    pos_df_NT = pd.DataFrame()
-    pos_df_OLB = pd.DataFrame()
-    pos_df_OT = pd.DataFrame()
-    pos_df_P = pd.DataFrame()
-    pos_df_QB = pd.DataFrame()
-    pos_df_RB = pd.DataFrame()
-    pos_df_S = pd.DataFrame()
-    pos_df_SAF = pd.DataFrame()
-    pos_df_TE = pd.DataFrame()
-    pos_df_WR = pd.DataFrame()
+pos_df_C = pd.DataFrame()
+pos_df_CB = pd.DataFrame()
+pos_df_DB = pd.DataFrame()
+pos_df_DE = pd.DataFrame()
+pos_df_DL = pd.DataFrame()
+pos_df_DT = pd.DataFrame()
+pos_df_FB = pd.DataFrame()
+pos_df_FS = pd.DataFrame()
+pos_df_G = pd.DataFrame()
+pos_df_ILB = pd.DataFrame()
+pos_df_K = pd.DataFrame()
+pos_df_LB = pd.DataFrame()
+pos_df_LS = pd.DataFrame()
+pos_df_MLB = pd.DataFrame()
+pos_df_NT = pd.DataFrame()
+pos_df_OLB = pd.DataFrame()
+pos_df_OT = pd.DataFrame()
+pos_df_P = pd.DataFrame()
+pos_df_QB = pd.DataFrame()
+pos_df_RB = pd.DataFrame()
+pos_df_S = pd.DataFrame()
+pos_df_SAF = pd.DataFrame()
+pos_df_TE = pd.DataFrame()
+pos_df_WR = pd.DataFrame()
 
 
 # Loop through links_df to scrape all players data:
-for i in range(0, 5): #len(links_df)):
+for i in range(0, 3): #len(links_df)):
     try:
         webpage = links_df['Player link'][i] + 'stats/'
         print(webpage)
@@ -80,8 +81,23 @@ for i in range(0, 5): #len(links_df)):
         print(player_pos)
 
 
-### TODO: continue here with the webpage parsing code. See roster_scrape.py for reference.
+### Continue here with the webpage parsing code. See roster_scrape.py for reference:
+        ### Need to create a beautifulsoup object to parse the whole page:
+        res = requests.get(webpage)
+        webpage = res.content
+        soup = BeautifulSoup(webpage, 'html.parser')
 
+    ### pd.read_html() parses for tables and returns a list of dataframes.
+        dfs = pd.read_html(webpage)
+        df = dfs[0]
+
+        df['Team'] = str(soup.find('a', {'class': 'nfl-o-cta--link'}).text.strip())
+        df['Year'] = 2022
+        print(dfs[0])
+
+        ### TODO: Now concatenate the player's dfs[0] with the global df that matches their position title:
+        print('Player DataFrame concatenated with global positional DataFrame: ' + 'pos_df_' + player_pos)
+        #pos_df_ = pd.concat([roster_df, df], ignore_index=True, axis=0)
 
     except:
         print('error during web scrape loop')

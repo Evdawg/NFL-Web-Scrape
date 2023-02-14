@@ -30,7 +30,7 @@ try:
 ### End code block here.
 #-----------------------------------------------------------------------------------------------------------------------
 
-# Send the completed roster_df to a SQL database using psycopg2 and SQLalchemy libraries:
+# Send the Pandas DataFrame (roster_df) to a SQL database using psycopg2 and SQLalchemy libraries:
     with engine.begin() as connection:
         roster_df.to_sql(
             name= '<table name here>',
