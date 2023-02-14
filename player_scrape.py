@@ -91,13 +91,19 @@ for i in range(0, 3): #len(links_df)):
         dfs = pd.read_html(webpage)
         df = dfs[0]
 
-        df['Team'] = str(soup.find('a', {'class': 'nfl-o-cta--link'}).text.strip())
+        try:
+            df['Team'] = str(soup.find('a', {'class': 'nfl-o-cta--link'}).text.strip())
+        except:
+            df['Team'] = 'N/A'
+
         df['Year'] = 2022
         print(dfs[0])
 
         ### TODO: Now concatenate the player's dfs[0] with the global df that matches their position title:
-        print('Player DataFrame concatenated with global positional DataFrame: ' + 'pos_df_' + player_pos)
+        #print('Player DataFrame concatenated with global positional DataFrame: ' + 'pos_df_' + player_pos)
         #pos_df_ = pd.concat([roster_df, df], ignore_index=True, axis=0)
+
+
 
     except:
         print('error during web scrape loop')
